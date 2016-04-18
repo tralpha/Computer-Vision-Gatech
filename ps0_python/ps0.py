@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
 def show_img(img):
     """
     Shows an image in RGB using matplotlib pyplot
@@ -7,8 +11,13 @@ def show_img(img):
     Args:
         img: An opencv instance of the image to be displayed
     """
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    plt.imshow(img)
+    if img.ndim == 3:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        color_map = None
+    else:
+        color_map = 'gray'
+    plt.imshow(img, cmap=color_map)
+    #return imgplot
 
 
 def determine_fig_partition(num_imgs):
@@ -59,10 +68,101 @@ def show_multiple_images(images, convert_to_rgb = True):
         a.set_title(img)
         if convert_to_rgb == True:
             #cv2.cvtColor(images[img], cv2.COLOR_BGR2RGB)
-            imgplot = plt.imshow(cv2.cvtColor(images[img],\
-                                              cv2.COLOR_BGR2RGB))
+            #plt.imshow(cv2.cvtColor(images[img],\
+             #                                 cv2.COLOR_BGR2RGB))
+            show_img(images[img])
         else:
-            imgplot = plt.imshow(images[img])
+            #plt.imshow(images[img])
+            show_img(images[img])
         a.get_xaxis().set_ticks([])
         a.get_yaxis().set_ticks([])  
     plt.show()
+
+
+def determine_img_center(img, center_left=True, center_up=True, center=100):
+    """
+    Determines the center of an image.
+
+    Args:
+        img: An opencv instance of an image.
+        center_left: A boolean to determine whether the you should push the 
+            center width to the left or push it to the right. If the value 
+            is true, the value will be pushed to the left. If it is false, 
+            then it will be pushed to the right.
+        center_up: A boolean to determine whether the you should push the 
+            center of the image height to the up or down. If the value is true, 
+            the value will be pushed to up. If it is false, then it will be 
+            pushed down.
+
+    Returns:
+        A tuple, representing the center of the image height and the center of 
+        the image width.
+    """
+    if img.shape[0] % 2 == 0:
+        center_height = img.shape[0]/2
+    elif center_up == True:
+        center_height = img.shape[0]-1/2
+    else:
+        center_height = img.shape[0]+1/2
+
+    if img.shape[1] % 2 == 0:
+        center_width = img.shape[1]/2
+        even_height = True
+    elif center_left == True:
+        center_width = img.shape[1]-1/2
+    else:
+        center_width = img.shape[1]+1/2
+    half_center = center/2
+    first_dim_idx = center_height-half_center, center_height+half_center
+    sec_dim_idx = center_width-half_center, center_width+half_center
+    return first_dim_idx, sec_dim_idx
+
+
+def center_100_pixels(img, center_left=True, center_up=True, center=100):
+    """
+    Extracts the middle 100 pixels of an image.
+
+    Args:
+        img: An opencv instance of an images.
+        center_left: A boolean to determine whether the you should push the 
+            center width to the left or push it to the right. If the value 
+            is true, the value will be pushed to the left. If it is false, 
+            then it will be pushed to the right.
+        center_up: A boolean to determine whether the you should push the 
+            center of the image height to the up or down. If the value is true, 
+            the value will be pushed to up. If it is false, then it will be 
+            pushed down.
+        center: An int to indicate how many middle pixels you need to extract.
+
+    Returns:
+        A tuple, representing the center of the image height and the center of
+        the image width.
+
+    """
+    center_height = 0
+    center_width = 0
+    even_height = False
+    first_dim, sec_dim = determine_img_center(img)
+    center_pixs = img[first_dim[0]:first_dim[1], sec_dim[0]:sec_dim[1]]
+    #import ipdb; ipdb.set_trace()
+    return center_pixs
+
+
+def replace_100_pix(img_1, img_2, center=100):
+    img_3 = img_2
+    img_1_center = center_100_pixels(img_1)
+    img_3_first, img_3_sec = determine_img_center(img_3)
+    img_3[img_3_first[0]:img_3_first[1], img_3_sec[0]:img_3_sec[1]] =\
+                                                             img_1_center
+    return img_3
+    
+
+
+
+if __name__ == '__main__':
+    center_100_pixels()
+
+
+
+
+
