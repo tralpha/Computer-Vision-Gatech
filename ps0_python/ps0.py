@@ -172,6 +172,18 @@ def shift_img(img):
     else:
         shifted[:,-2:] = 0
     return shifted
+
+
+def conv_to_uint8(arr):
+    """
+    Converts an array type to uint8 suitable for image processing.
+    Args:
+        array: A numpy array
+    Returns:
+        A uint8 numpy array
+    """
+    uint8_arr = np.uint8(np.clip(arr, 0, 255))
+    return uint8_arr
     
 
 
