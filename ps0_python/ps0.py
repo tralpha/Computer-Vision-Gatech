@@ -155,6 +155,23 @@ def replace_100_pix(img_1, img_2, center=100):
     img_3[img_3_first[0]:img_3_first[1], img_3_sec[0]:img_3_sec[1]] =\
                                                              img_1_center
     return img_3
+
+
+def shift_img(img):
+    """
+    Shifts image by 2 pixels to the left
+    Args:
+        img: An opencv instance of the image.
+
+    Returns:
+        An opencv instance of the shifted image.
+    """
+    shifted = np.roll(img, -2, axis=1)
+    if img.ndim == 3:
+        shifted[:,-2:,:] = 0
+    else:
+        shifted[:,-2:] = 0
+    return shifted
     
 
 
